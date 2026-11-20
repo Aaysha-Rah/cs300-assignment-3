@@ -26,3 +26,42 @@ export function validateRecord(record) {
         errors: errors
     };
 }
+
+// Takes one book record and returns a cleaned copy.
+// Does not change the original record.
+export function normalizeRecord(record) {
+    return {
+        ...record,
+        title: record.title?.trim(),
+        creator: record.creator?.trim()
+    };
+}
+// Takes an array of books and a condition.
+// Returns a new array of matching books.
+// Does not change the original array.
+export function filterRecords(records, condition) {
+    return records.filter(condition);
+}
+
+// Takes an array of books and a search query.
+// Returns matching books without changing the original array.
+export function searchRecords(records, query) {
+    const searchText = query.toLowerCase();
+
+    return records.filter(book =>
+        book.title.toLowerCase().includes(searchText) ||
+        book.creator.toLowerCase().includes(searchText)
+    );
+}
+
+// Takes an array of books and a property.
+// Returns a new sorted array without changing the original.
+export function sortRecords(records, property) {
+    return [...records].sort((a, b) => {
+        if (a[property] === b[property]) {
+            return a.title.localeCompare(b.title);
+        }
+
+        return a[property] - b[property];
+    });
+}
