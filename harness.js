@@ -1,6 +1,11 @@
 // Assignment 3: verification harness. Run it with: node harness.js
 //
-import { validateRecord, normalizeRecord, filterRecords, searchRecords, sortRecords } from "./toolkit.js";
+import { readFileSync } from "node:fs";
+
+const books = JSON.parse(
+    readFileSync("data/books.json", "utf8")
+);
+import { validateRecord, normalizeRecord, filterRecords, searchRecords, sortRecords, summarizeRecords, buildReport } from "./toolkit.js";
 // 1. Import your functions from "./toolkit.js" and load your scenario's dataset from data/.
 // 2. Write at least 12 named cases: normal inputs plus the five edge cases
 //    (empty array, missing property, invalid number or wrong type,
@@ -51,4 +56,37 @@ const booksToSort = [
 
 console.log("Sorted books:", sortRecords(booksToSort, "minutes"));
 console.log("Original order:", booksToSort);
+console.log("Empty summary:", summarizeRecords([]));
+console.log("Full book summary:", summarizeRecords(books));
+console.log("Book report:", buildReport(books, "robot"));
+
+console.log("Missing title:", validateRecord({
+    creator: "Mina Reed",
+    minutes: 240
+})
+);
+
+// Check that normalization does not change the original book
+const bookBefore = JSON.stringify(originalBook);
+
+normalizeRecord(originalBook);
+
+const bookAfter = JSON.stringify(originalBook);
+
+console.log(
+    "PASS normalize does not mutate:",
+    bookBefore === bookAfter
+);
+
+// Check that sorting does not change the original array
+const arrayBefore = JSON.stringify(booksToSort);
+
+sortRecords(booksToSort, "minutes");
+
+const arrayAfter = JSON.stringify(booksToSort);
+
+console.log(
+    "PASS sort does not mutate:",
+    arrayBefore === arrayAfter
+);
 

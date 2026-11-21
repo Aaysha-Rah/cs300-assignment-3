@@ -14,11 +14,18 @@
 // and whether it changes its input. Decide your tie rule for equal values
 // and the shape of your validation errors before you write the code.
 
+// Takes one book record.
+// Returns a validation result with an errors list.
+// Does not change the original record.
 export function validateRecord(record) {
     const errors = [];
 
     if (typeof record.minutes !== "number") {
         errors.push("minutes must be a number");
+    }
+
+    if (typeof record.title !== "string" || record.title.trim() === "") {
+        errors.push("title is required");
     }
 
     return {
@@ -64,4 +71,37 @@ export function sortRecords(records, property) {
 
         return a[property] - b[property];
     });
+}
+
+// Takes an array of books.
+// Returns the number of books and total reading minutes.
+// Does not change the original array.
+export function summarizeRecords(records) {
+    const count = records.length;
+
+    const totalMinutes = records.reduce((total, book) => {
+        const minutes = book.minutes;
+        return total + (typeof minutes === "number" ? minutes : 0);
+    }, 0);
+
+    return {
+        count: count,
+        totalMinutes: totalMinutes
+    };
+}
+
+// Takes book records and a search query.
+// Returns a report without changing the original records.
+export function buildReport(records, query) {
+    // Step 1: Find books matching the query.
+    const matches = searchRecords(records, query);
+
+    // Step 2: Sort matching books by reading time.
+    const sortedBooks = sortRecords(matches, "minutes");
+
+    // Step 3: Return the report.
+    return {
+        query: query,
+        books: sortedBooks
+    };
 }
