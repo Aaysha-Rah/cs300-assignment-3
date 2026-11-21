@@ -12,6 +12,14 @@ import { validateRecord, normalizeRecord, filterRecords, searchRecords, sortReco
 //    different capitalization, equal values when sorting) and a nonmutation check.
 // 3. Each case prints its name, the expected result, the actual result,
 //    and the word PASS or FAIL, for example:
+function runTest(name, expected, actual) {
+    const passed =
+        JSON.stringify(expected) === JSON.stringify(actual);
+
+    console.log(
+        `${passed ? "PASS" : "FAIL"} ${name} | expected: ${JSON.stringify(expected)} | actual: ${JSON.stringify(actual)}`
+    );
+}
 //    PASS  search ignores capitalization  expected: 1  actual: 1
 // 4. Work out each expected result from the data before you run the case.
 console.log(validateRecord({ title: "Test Book", minutes: "thirty" }));
@@ -90,3 +98,80 @@ console.log(
     arrayBefore === arrayAfter
 );
 
+runTest(
+    "Empty array summary",
+    { count: 0, totalMinutes: 0 },
+    summarizeRecords([])
+);
+
+runTest(
+    "Missing title validation",
+    { valid: false, errors: ["title is required"] },
+    validateRecord({ creator: "Mina Reed", minutes: 240 })
+);
+
+runTest(
+    "Invalid minutes validation",
+    { valid: false, errors: ["minutes must be a number"] },
+    validateRecord({ title: "Test Book", minutes: "thirty" })
+);
+
+runTest(
+    "Search lowercase robot",
+    1,
+    searchRecords(books, "robot").length
+);
+
+runTest(
+    "Search uppercase ROBOT",
+    1,
+    searchRecords(books, "ROBOT").length
+);
+
+runTest(
+    "Search by creator",
+    1,
+    searchRecords(books, "mina").length
+);
+
+runTest(
+    "Full book summary",
+    { count: 8, totalMinutes: 1410 },
+    summarizeRecords(books)
+);
+
+runTest(
+    "Equal minutes alphabetical order",
+    ["Quiet Satellites", "Robot Garden"],
+    sortRecords(
+        [
+            { title: "Robot Garden", minutes: 240 },
+            { title: "Quiet Satellites", minutes: 240 }
+        ],
+        "minutes"
+    ).map(book => book.title)
+);
+
+runTest(
+    "Normalize trims spaces",
+    "Robot Garden",
+    normalizeRecord({ title: "  Robot Garden  " }).title
+);
+
+runTest(
+    "Filter art books",
+    2,
+    filterRecords(books, book => book.category === "Art").length
+);
+
+runTest(
+    "Combined report search",
+    ["Robot Garden"],
+    buildReport(books, "robot").books.map(book => book.title)
+);
+
+runTest(
+    "Sorting does not mutate",
+    true,
+    arrayBefore === arrayAfter
+);
